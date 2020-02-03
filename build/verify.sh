@@ -119,6 +119,7 @@ testDockerOnOpenShift()
    testLibertyStopsAndRestarts "OpenShift"
 }
 
+
 tests=$(declare -F | cut -d" " -f3 | grep "test")
 for name in $tests
 do

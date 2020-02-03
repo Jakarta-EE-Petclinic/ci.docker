@@ -8,14 +8,40 @@ sudo: required
 
 before_install:
   - sudo apt-get update
+
+# delete in progress images
+after_failure:
+  - cd releases
+  - ../build/cleanup.sh
+
+## 3 archs x 3 release matrix
+os: linux
+arch:
+  - amd64
+  - ppc64le
+  - s390x
+
 env:
   - RELEASE=../releases/19.0.0.9
   - RELEASE=../releases/19.0.0.12
   - RELEASE=../releases/latest
 
+## build all releases and push in progress images on master
 script:
 - uname -a
 - cat /etc/issue
-- pwd
 - cd build
-- ./buildAll.sh $RELEASE
+- ./buildAll.sh --release $RELEASE
+
+## build manifest list for each release and delete in progress images
+jobs:
+  include:
+    - stage: build-fat-manifest
+      if: branch=master AND type!=pull_request
+      script:
+      - uname -a
+      - cat /etc/issue
+      - cd releases
+      - wget https://github.com/estesp/manifest-tool/releases/download/v0.9.0/manifest-tool-linux-amd64 -O manifest-tool
+      - chmod +x manifest-tool
+      - ../build/buildManifest.sh
