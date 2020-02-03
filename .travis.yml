@@ -1,10 +1,8 @@
-language: bash
+language: shell
 
 dist: xenial
 
 os: linux
-
-sudo: required
 
 before_install:
   - sudo apt-get update
@@ -14,17 +12,12 @@ after_failure:
   - cd releases
   - ../build/cleanup.sh
 
-## 3 archs x 3 release matrix
+## 3 archs  matrix
 os: linux
 arch:
   - amd64
   - ppc64le
   - s390x
-
-env:
-  - RELEASE=../releases/19.0.0.9
-  - RELEASE=../releases/19.0.0.12
-  - RELEASE=../releases/latest
 
 ## build all releases and push in progress images on master
 script:

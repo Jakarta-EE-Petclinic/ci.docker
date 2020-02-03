@@ -21,16 +21,14 @@ main() {
     buildCommand="${buildCommand} -t ${local_tag}"
   fi
 
-  buildCommand="${buildCommand} -f ${dir}/${dockerfiles} ${dir}"
+  buildCommand="${buildCommand} -f ${dir}/${dockerfile} ${dir}"
   echo "*** ${buildCommand}"
   eval "${buildCommand}"
 
   if [ $? = 0 ]; then
-    echo "****"
-    echo "Build successful ${dir} (${tag} ${local_tag})"
-    echo "****"
+    echo "****** Build successful ${dir} (${tag} ${local_tag})"
   else
-    echo "Build failed ${dir} (${tag} ${local_tag}), exiting."
+    echo "****** Build failed ${dir} (${tag} ${local_tag}), exiting."
     exit 1
   fi
 }
