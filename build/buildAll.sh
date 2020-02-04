@@ -17,7 +17,14 @@ main() {
       ARCH="amd64"
   esac
 
+  ## build base image for ibmjava tags
+  build_ibmjava
+
+  ## loop through versions and build
   for rel in "${RELEASES[@]}"; do
+    echo "*******************************"
+    echo "BUILDING RELEASE: ${rel}"
+    echo "*******************************"
     build_release "../releases/${rel}"
   done
 }
@@ -48,7 +55,6 @@ build_release() {
     echo "${DOCKER_PASSWORD}" | docker login -u "${DOCKER_USERNAME}" --password-stdin
     echo "*** Pushing ${repository}:${tag}-inprogress"
     docker push "${repository}:${tag}-inprogress"
-    return $?
   fi
 
   if [[ "${releaseDir}" =~ latest ]]; then
@@ -68,4 +74,21 @@ test_images() {
   done
 }
 
+## replace user 1001 entries in ibmjava files and then build manually
+build_ibmjava() {
+  echo "*** Building ibmjava:8-ubi"
+  mkdir java
+  wget https://raw.githubusercontent.com/ibmruntimes/ci.docker/master/ibmjava/8/jre/ubi/Dockerfile -O java/Dockerfile
+  wget https://raw.githubusercontent.com/ibmruntimes/ci.docker/master/ibmjava/8/sfj/ubi-min/Dockerfile -O java/Dockerfile-ubi-min
+  ## replace references to user 1001 as we need to build as root
+  sed -i.bak '/useradd -u 1001*/d' ./java/Dockerfile && \
+    sed -i.bak '/USER 1001/d' ./java/Dockerfile && \
+    rm java/Dockerfile.bak
+  sed -i.bak '/useradd -u 1001*/d' ./java/Dockerfile-ubi-min && \
+    sed -i.bak '/USER 1001/d' ./java/Dockerfile-ubi-min && \
+    rm java/Dockerfile-ubi-min.bak
+  ## tag UBI 8 as ibmjava:8-ubi and UBI 7 for older versions as ibmjava:8-ibmsfj-ubi-min
+  docker build -t ibmjava:8-ubi java
+  docker build -t ibmjava:8-ibmjsf-ubi-min -f ./java/Dockerfile-ubi-min java
+}
 main $@
