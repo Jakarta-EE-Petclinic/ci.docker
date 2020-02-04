@@ -53,13 +53,25 @@ build_release() {
   ## on master push images to dockerhub for manifest script
   if [[ "$travis" = "true" && "$travis_pull_request" = "false" && "$travis_branch" = "master" ]]; then
     echo "${DOCKER_PASSWORD}" | docker login -u "${DOCKER_USERNAME}" --password-stdin
-    echo "*** Pushing ${repository}:${tag}-inprogress"
-    docker push "${repository}:${tag}-inprogress"
+
+    push_image "${repository}:${tag}-inprogress"
   fi
 
   if [[ "${releaseDir}" =~ latest ]]; then
     test_images
   fi
+}
+
+push_image() {
+  local image="${1}"
+
+  if [[ "${image}" =~ ubuntu ]]; then
+    echo "*** Ubuntu image detected, skipping push..."
+    return
+  fi
+
+  echo "*** Pushing ${image}"
+  docker push ${image}
 }
 
 test_images() {
