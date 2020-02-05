@@ -1,4 +1,4 @@
-ARG IMAGE=openliberty/open-liberty:kernel-ubi
+ARG IMAGE=openliberty/open-liberty:kernel-java8-openj9-ubi
 FROM ${IMAGE}
 
 COPY --chown=1001:0 config /config/
