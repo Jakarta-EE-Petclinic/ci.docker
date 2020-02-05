@@ -17,7 +17,7 @@ main() {
 
   local buildCommand="docker build -t ${tag}"
 
-  if [[ -z "${local_tag}" ]]; then
+  if [[ ! -z "${local_tag}" ]]; then
     buildCommand="${buildCommand} -t ${local_tag}"
   fi
 
