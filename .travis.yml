@@ -23,6 +23,7 @@ arch:
 script:
 - uname -a
 - cat /etc/issue
+- df -h
 - cd build
 - ./buildAll.sh --release $RELEASE
 
